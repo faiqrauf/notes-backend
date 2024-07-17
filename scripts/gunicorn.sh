@@ -1,7 +1,7 @@
 #!/usr/bin/bash
 
 # Replace {YOUR_PROJECT_MAIN_DIR_NAME} with your actual project directory name
-PROJECT_MAIN_DIR_NAME="notes-backend"
+PROJECT_MAIN_DIR_NAME="notes_backend"
 
 # Copy gunicorn socket and service files
 sudo cp "/home/ubuntu/$PROJECT_MAIN_DIR_NAME/gunicorn/gunicorn.socket" "/etc/systemd/system/gunicorn.socket"
@@ -10,3 +10,6 @@ sudo cp "/home/ubuntu/$PROJECT_MAIN_DIR_NAME/gunicorn/gunicorn.service" "/etc/sy
 # Start and enable Gunicorn service
 sudo systemctl start gunicorn.service
 sudo systemctl enable gunicorn.service
+
+
+sudo cp /home/ubuntu/notes_backend/gunicorn/gunicorn.socket /etc/systemd/system/gunicorn.socket
