@@ -1,12 +1,12 @@
 #!/bin/bash
 set -e
 
-GIT_REPO_URL="https://github.com/faiqrauf/notes-backend.git"
+GIT_REPO_URL="https://github.com/faiqrauf/notes_backend.git"
 
-PROJECT_MAIN_DIR_NAME="notes-backend"
+PROJECT_MAIN_DIR_NAME="notes_backend"
 
-mkdir -p /home/ubuntu/django-notes-app
-cd /home/ubuntu/django-notes-app
+# mkdir -p /home/ubuntu/django-notes-app
+# cd /home/ubuntu/django-notes-app
 
 git clone "$GIT_REPO_URL" "/home/ubuntu/$PROJECT_MAIN_DIR_NAME"
 
@@ -33,15 +33,22 @@ sudo apt install -y python3-pip python3-dev libpq-dev nginx curl
 # cd /home/ubuntu/django-notes-app
 
 # Install and create a virtual environment
-sudo pip3 install virtualenv
-virtualenv myenv
-source myenv/bin/activate
+# sudo apt install python3-virtualenv
+# Install dependencies
+echo "Installing Python dependencies..."
+pip install -r "/home/ubuntu/$PROJECT_MAIN_DIR_NAME/requirements.txt"
+
+sudo virtualenv env
+source env/bin/activate
+
+# adjust rights for the venv
+sudo chmod -R a+rwx en
 
 # Install Django and Gunicorn
-pip install django gunicorn psycopg2-binary
+# pip3 install django gunicorn psycopg2-binary 
 
 # Start a new Django project
-django-admin startproject notes-backend .
+django-admin startproject notes_backend .
 
 # Apply migrations
 python manage.py migrate
@@ -61,8 +68,8 @@ After=network.target
 [Service]
 User=ubuntu
 Group=www-data
-WorkingDirectory=/home/ubuntu/notes-backend
-ExecStart=/home/ubuntu/notes-backend/venv/bin/gunicorn \
+WorkingDirectory=/home/ubuntu/notes_backend
+ExecStart=/home/ubuntu/notes_backend/venv/bin/gunicorn \
           --access-logfile - \
           --workers 3 \
           --bind unix:/run/gunicorn.sock \
@@ -77,14 +84,14 @@ sudo systemctl start gunicorn
 sudo systemctl enable gunicorn
 
 # Configure Nginx to proxy pass to Gunicorn
-sudo tee /etc/nginx/sites-available/notes-backend > /dev/null <<EOF
+sudo tee /etc/nginx/sites-available/notes_backend > /dev/null <<EOF
 server {
     listen 80 default_server;
     server_name _;
 
     location = /favicon.ico { access_log off }
     location /static/ {
-        root /home/ubuntu/notes-backend;
+        root /home/ubuntu/notes_backend;
     }
 
     location / {
@@ -95,7 +102,7 @@ server {
 EOF
 
 # Enable the Nginx server block configuration by creating a symbolic link
-sudo ln -s /etc/nginx/sites-available/notes-backend /etc/nginx/sites-enabled
+sudo ln -s /etc/nginx/sites-available/notes_backend /etc/nginx/sites-enabled
 
 # Test the Nginx configuration
 sudo nginx -t
